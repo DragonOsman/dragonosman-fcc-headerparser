@@ -7,6 +7,9 @@ const express = require("express");
 const path = require("path");
 const app = express();
 
+// In case we're behind a proxy:
+app.set("trust proxy", true);
+
 // enable CORS (https://en.wikipedia.org/wiki/Cross-origin_resource_sharing)
 // so that your API is remotely testable by FCC
 const cors = require("cors");
@@ -30,8 +33,10 @@ const listener = app.listen(process.env.PORT, function () {
   console.log(`Your app is listening on port ${listener.address().port}`);
 });
 
-app.get("/api/whomai", (req, res) => {
-  const ipAddress = req.ip;
+app.get("/api/whoami", (req, res) => {
+  // get IP address through X-Forwarded-For header or
+  // use req.connection.remoteAddress
+  const ipAddress = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
   const language = req.headers["accept-language"];
   const userAgent = req.headers["user-agent"];
 
